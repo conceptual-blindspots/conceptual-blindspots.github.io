@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uncovering Conceptual Blindspots in Generative Image Models Using Sparse Autoencoders</title>
+    <meta name="description" content="A systematic framework for identifying and characterizing conceptual blindspots in generative image models using sparse autoencoders.">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <meta name="robots" content="all">
+    <meta content="en_EN" property="og:locale">
+    <meta content="website" property="og:type">
+    <meta content="https://example.com/conceptual-blindspots" property="og:url">
+    <meta content="Uncovering Conceptual Blindspots in Generative Image Models Using Sparse Autoencoders" property="og:title">
+    <meta content="A systematic framework for identifying and characterizing conceptual blindspots in generative image models" property="og:description">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@your_twitter_id">
+    <meta name="twitter:description" content="Uncovering Conceptual Blindspots in Generative Image Models Using Sparse Autoencoders">
+    <meta name="twitter:image:src" content="assets/figures/teaser.png">
+    
+    <link rel="stylesheet" type="text/css" media="all" href="assets/stylesheets/main_free.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="clarity/clarity.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/foundation.min.css">
+    <link href="assets/fontawesome-free-6.6.0-web/css/all.min.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/img-comparison-slider@8/dist/index.js"></script>
+    <script src="assets/scripts/navbar.js"></script>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            "HTML-CSS": {
+              scale: 95,
+              fonts: ["Gyre-Pagella"],
+              imageFont: null,
+              undefinedFamily: "'Arial Unicode MS', cmbright"
+            },
+            tex2jax: {
+                inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+                processEscapes: true
+              }
+          });
+    </script>
+    <script type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        .fillable svelte-n2mxwf app {
+           padding: 0 !important; 
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Title Page -->
+    <div class="container blog" id="first-content" style="background-color: #E0E4E6;">
+        <div class="blog-title">
+            <div class="blog-intro">
+                <div>
+                    <h1 class="title"><b>Uncovering Conceptual Blindspots in Generative Image Models Using Sparse Autoencoders</b></h1>
+                    <p class="author">
+                        <a href="https://www.matyasbohacek.com">Maty Bohacek</a> <sup>1</sup>, <a href="https://thomasfel.fr">Thomas Fel</a> <sup>2</sup>, <a href="https://www.graphics.stanford.edu/~maneesh/">Maneesh Agrawala</a> <sup>1</sup>, and <a href="https://ekdeepslubana.github.io">Ekdeep Singh Lubana</a> <sup>2</sup>
+                    </p>
+                    <p class="author" style="padding-top: 0px;">
+                        <sup>1</sup> Stanford University <br>
+                        <sup>2</sup> Harvard University
+                    </p>
+                    <p class="abstract">
+                        Generative image models often miss seemingly simple concepts despite being trained on them. We introduce a method to identify such “conceptual blindspots”, leveraging a sparse autoencoder (RA-SAE) trained on DINOv2 features. We demonstrate the method on four popular T2I models, revealing suppressed blindspots (e.g., whitespace on documents and bird feeders) and exaggerated blindspots (e.g., wooden background textures). We also detect memorization artifacts.
+                    </p>
+
+                    <div class="info">
+                        <div>
+                            <a href="" class="button icon" style="background-color: rgba(255, 255, 255, 0.2)"> Paper <i class="fa-solid fa-book-open"></i></a> &nbsp;&nbsp; 
+                            <a href="" class="button icon" style="background-color: rgba(255, 255, 255, 0.2)">Code <i class="fa-solid fa-code"></i></a>  &nbsp;&nbsp; 
+                            <a href="https://sae-diff.github.io/" class="button icon" style="background-color: rgba(255, 255, 255, 0.2);">Demo <i class="fa-solid fa-globe"></i></a> &nbsp;&nbsp; 
+                            <a href="" class="button icon" style="background-color: rgba(255, 255, 255, 0.2);">RA-SAE <i class="fa-regular fa-database"></i></a> &nbsp;&nbsp; 
+                        </div>
+                    </div>
+                </div>
+               
+                <!--<div class="info">
+                    <p>UNDER REVIEW</p>
+                </div>-->
+            </div>
+
+            <div class="blog-cover" style="width: 100% !important;">
+                <img src="assets/figures/main.png">
+                
+            </div>
+        </div>
+    </div>
+
+    <div class="container blog main first" id="blog-main">
+        <p class='text'>
+            Generative image models trained on large scale datasets have achieved unprecedented capabilities, allowing their use in applications both within the vision domain and well beyond. Despite this success, several qualitative and quantitative studies have shown that, at times, models can struggle to generate images with relatively simple concepts, e.g., human hands, objects appearing in groups of four, and negations or object relations.
+        </p>
+        <p class='text'>
+            These failure modes, which we call "conceptual blindspots", can be unintuitive, since one may reasonably expect models have had enough exposure to demonstrations accurately detailing such concepts. This raises the question whether such failures reflect intriguing quirks of certain specific concepts, or whether they are demonstration of a more systematic phenomenon.
+        </p>
+        <p class='text'>
+            To identify and analyze conceptual blindspots in an automated and unsupervised manner, we propose a methodology that elicits concepts in the data distribution that have a mismatch between their odds of generation by the true data-generating process versus the trained model.
+        </p>
+    </div>
+
+    <div class="container blog main gray">
+
+        <img src="assets/figures/fig-1.png">
+        <p class="caption">
+            The depicted images, generated by four popular generative image models, show examples of images with conceptual blindspots, as well as aligned concepts. $\delta(k)$ quantifies a model's tendency to over- or under-generate a concept $c_k$ compared to its natural-data frequency. We deem concepts with $\delta(k)&lt;0.1$ as suppressed conceptual blindspots and concepts with $\delta(k)&gt;0.9$ as exaggerated conceptual blindspots. 
+        </p>
+    
+    </div>
+
+    <div class="container blog main">
+        <h1>Interactive Exploratory Tool</h1>
+        <p class="text">
+            We release <a href="https://sae-diff.github.io/">an interactive exploratory tool</a> that enables researchers and practitioners to explore conceptual blindspots across four state-of-the-art generative image models. The tool supports both distribution-level analysis to identify systematic blindspots and datapoint-level examination to reveal specific instances of concept omission or memorization.
+        </p>
+        <p class='text'>
+            To perform the conceptual blindspots analysis on your own model and generate the same visualization, follow our <a href="https://github.com/maty-bohacek/conceptual-blindspots">open-source codebase</a>.
+        </p>
+    </div>
+
+    <div class="container blog main gray">
+
+        <img src="assets/figures/fig-2.png">
+        <p class="caption">
+            The web interface displays a UMAP projection for each evaluated model, where each dot represents a concept, color-coded by its energy difference. When a concept is selected, a detail panel presents illustrative images, statistics, and the most representative natural and generated images <b>$x$</b> and <b>${x}^{\prime}$</b> An ordered list of the concept's co-occurrences is shown alongside global rankings of blindspots.
+        </p>
+    
+    </div>
+
+    <div class="container blog main">
+        <h1>Results</h1>
+        <p class="text">
+            We analyze four popular T2I models trained—at least in part—on LAION-5B: Stable Diffusion 1.5, Stable Diffusion 2.1, PixArt, and Kandinsky, using 10,000 image-text pairs and their corresponding generations. Our findings include:
+        </p>
+
+        <ul style="margin-left: 3em !important;">
+
+            <li><p class="text"><b>Generative image models cannot produce unseen concepts.</b> Even when concepts are present in training data, models show systematic gaps where they either severely under-represent certain concepts (suppressed blindspots) or over-emphasize others (exaggerated blindspots), revealing fundamental limitations in their ability to faithfully capture the full conceptual diversity of their training data.</p></li>
+
+            <li><p class="text"><b>Post-training reduces conceptual blindspots.</b> Models fine-tuned with DPO show better alignment between generated and natural concept distributions, producing outputs that more closely match real-world frequencies.</p></li>
+
+        </ul>
+
+    </div>
+
+    <div class="container blog main gray">
+
+        <img src="assets/figures/fig-3.png">
+        <p class="caption">
+        Effect of DPO on Concept Fidelity. Histogram of datapoint-wise energy differences between the synthesized and natural distribution of SD 1.5 models with and without DPO.
+        </p>
+    
+    </div>
+
+    <div class="container blog main">
+
+        <ul style="margin-left: 3em !important;">
+
+            <li><p class="text"><b>Blindspots are linked to concept rarity.</b> Concepts that appear infrequently in training data are much more likely to become suppressed blindspots, suggesting models struggle with the "long tail" of rare visual concepts.</p></li>
+
+            <li><p class="text"><b>Our method can also detect memorization artifacts.</b> The proposed method can identify when models are copying specific visual templates from training data rather than genuinely understanding and generating concepts.</p></li>
+
+            <li><p class="text">Refer to <a href="https://arxiv.org/abs/2506.19708">our paper</a> for the complete set of results.</p></li>
+
+        </ul>
+    </div>
+
+    <div class="container blog main gray">
+
+        <img src="assets/figures/fig-4.png">
+        <p class="caption">
+        Examples with minimal energy differences where models appear to memorize training patterns.
+        </p>
+    
+    </div>
+
+    <div class="container blog main">
+        <h1>Stress Testing</h1>
+        <p class="text">
+            To stress-test the blindspots identified by our method, we gathered a range of prompts describing these blindspots and used them to generate many images, which were ranked and manually reviewed. While a few hints of the desired concepts appeared, the models generally failed to generate the full concept. This aligns with our method's assessment and supports the validity of the stress test.
+        </p>
+
+        <p class="text">
+            Try this four yourself below! Can you get the models to produce these concepts? Share your best results—including the source prompts—on X or Bluesky with #conceptual-blindspots.
+        </p>
+    </div>
+
+    <script
+        type="module"
+        src="https://gradio.s3-us-west-2.amazonaws.com/5.35.0/gradio.js"
+    ></script>
+
+    <div class="container blog main gray">
+        <div class="columns-2">
+            <div>
+
+                <h2>SD 1.5</h2>
+                <p class="text">Example suppressed blindspot: <br> glossy DVD disc</p>
+
+                <iframe
+                    src="https://matybohacek-conceptual-blindspots-sd15.hf.space/?__theme=light"
+                    frameborder="0"
+                    height="480"
+                    style="width: 100%;"
+                ></iframe>
+
+            </div>
+            <div>
+                <h2>Kandinsky</h2>
+                <p class="text">Example suppressed blindspot: <br> bird feeder</p>
+
+                <iframe
+                    src="https://matybohacek-conceptual-blindspots-kandinsky.hf.space/?__theme=light"
+                    frameborder="0"
+                    height="480"
+                    style="width: 100%;"
+                ></iframe>
+            </div>
+        </div>
+    </div>
+
+    
+
+
+    <div class="container blog main">
+        <h1>Citation</h1>
+<pre><code class="plaintext">@article{bohacek2025uncovering,
+  title={Uncovering Conceptual Blindspots in Generative Image Models Using Sparse Autoencoders},
+  author={Bohacek, Matyas and Fel, Thomas and Agrawala, Maneesh and Lubana, Ekdeep Singh},
+  journal={arXiv preprint arXiv:2506.19708},
+  year={2025}
+}</code></pre>
+    </div>
+
+    <!-- Footer Page -->
+    <footer>
+        <div class="container">
+            <p style="font-size: small;">
+                Last updated January 2025. This website is built on the <a href="https://shikun.io/projects/clarity" style="font-size: small;">Clarity Template</a>, designed by <a href="https://shikun.io/" style="font-size: small;">Shikun Liu</a>.
+            </p>
+        </div>    
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script src="clarity/clarity.js"></script>    
+    <script src="assets/scripts/main.js"></script>    
+</body>
+</html>
