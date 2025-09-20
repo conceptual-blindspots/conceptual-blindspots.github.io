@@ -50,7 +50,14 @@
     </style>
 </head>
 
-<body>
+<body onload="if (document.activeElement) document.activeElement.blur();">
+
+    <script>
+        window.addEventListener('load', () => {
+            window.scrollTo(0, 0);
+        });
+    </script>
+
     <!-- Title Page -->
     <div class="container blog" id="first-content" style="background-color: #E0E4E6;">
         <div class="blog-title">
