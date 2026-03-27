@@ -1447,14 +1447,14 @@ footer p {
 /* ======================== Blog ===================== */
 div.container.blog#first-content div.blog-title .blog-intro p.author {
   padding: 4px 0 10px;
-  font-family: "HelveticaNeue";
+  font-family: "Charter";
   font-style: italic;
   font-weight: 400;
   line-height: 1.2;
   font-size: 85%;
 }
 div.container.blog#first-content div.blog-title .blog-intro p.abstract {
-  font-family: "HelveticaNeue";
+  font-family: "Charter";
   font-weight: 400;
   padding: 1vh 0;
   font-size: 85%;
@@ -1526,6 +1526,36 @@ select {
   font-weight: 600;
   color: #666667;
   font-family: "Charter", serif;
+}
+
+/* ======================== Hover Image Effect ===================== */
+.hover-image-container {
+  position: relative;
+  cursor: pointer;
+  display: block;
+}
+.hover-image-container .hover-image-default {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: opacity 0.3s ease-in-out;
+  opacity: 1;
+}
+.hover-image-container .hover-image-hover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: opacity 0.3s ease-in-out;
+  opacity: 0;
+}
+.hover-image-container:hover .hover-image-default {
+  opacity: 0;
+}
+.hover-image-container:hover .hover-image-hover {
+  opacity: 1;
 }
 
 /*# sourceMappingURL=main_free.css.map */
