@@ -98,6 +98,16 @@
     </div>
 
     <div class="container blog main first" id="blog-main">
+
+        <fieldset class="insights-box">
+            <legend>Key Takeaways</legend>
+            <ul style="margin-left: 1.5em; margin-bottom: 0;">
+                <li style="margin-bottom: 0.8em;"><b>Generative models have systematic conceptual blindspots.</b> Despite training on large-scale datasets, popular T2I models consistently fail to generate certain simple concepts (e.g., bird feeders, whitespace on documents), while over-generating others (e.g., wooden background textures).</li>
+                <li style="margin-bottom: 0.8em;"><b>Sparse autoencoders enable automated blindspot discovery.</b> Our RA-SAE, trained on DINOv2 features, decomposes images into 32,000 interpretable concept dimensions, enabling unsupervised comparison of concept distributions between natural and generated images.</li>
+                <li style="margin-bottom: 0.8em;"><b>Blindspots reveal memorization and mode collapse.</b> The framework not only identifies suppressed and exaggerated concepts but also detects memorization artifacts, providing a systematic diagnostic tool for generative image models.</li>
+            </ul>
+        </fieldset>
+
         <p class='text'>
             Generative image models trained on large scale datasets have achieved unprecedented capabilities, allowing their use in applications both within the vision domain and well beyond. Despite this success, several qualitative and quantitative studies have shown that, at times, models can struggle to generate images with relatively simple concepts, e.g., human hands, objects appearing in groups of four, and negations or object relations.
         </p>
