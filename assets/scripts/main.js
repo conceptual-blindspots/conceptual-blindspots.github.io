@@ -1,38 +1,67 @@
-//* ======================== Slide Control ===================== */
-var contents = document.getElementsByClassName("slide-content");
+/* ======================== Slide Control ===================== */
+/* A "slide menu" is a row of .dot buttons that swap between sibling
+   .slide-content blocks inside the same .container. Pass the id of each
+   menu you want wired up; several may coexist on one page. */
+function initializeSlideMenu(menuId) {
+  var menu = document.getElementById(menuId);
+  if (!menu) return;
 
-document.getElementById("slide-menu").addEventListener("click", function(e) {
-  const idx = [...this.children]
-    .filter(el => el.className.indexOf('dot') > -1)
-    .indexOf(e.target);
-    
-  if (idx >= 0) {
-    var prev = document.querySelector(".dot.active");
-    if (prev) prev.classList.remove("active");
-    e.target.classList.add("active");
-    
-    for (var i = 0; i < contents.length; i++) {
-      if (i == idx) {
-        contents[i].style.display = "block";
-      } else {
-        contents[i].style.display = "none";
+  var container = menu.closest('.container');
+  if (!container) return;
+
+  var contents = container.getElementsByClassName("slide-content");
+
+  menu.addEventListener("click", function(e) {
+    const idx = [...this.children]
+      .filter(el => el.className.indexOf('dot') > -1)
+      .indexOf(e.target);
+
+    if (idx >= 0) {
+      // Remove active from all dots in this menu
+      var prevDots = menu.querySelectorAll(".dot.active");
+      prevDots.forEach(dot => dot.classList.remove("active"));
+      e.target.classList.add("active");
+
+      // Show the selected slide
+      for (var i = 0; i < contents.length; i++) {
+        contents[i].style.display = (i == idx) ? "block" : "none";
       }
-    }  
-  }
+    }
+  });
+}
+
+// Any element with class "slide-menu" is wired up automatically; add an id
+// and call initializeSlideMenu('your-id') below for menus named otherwise.
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.slide-menu[id]').forEach(function(menu) {
+    initializeSlideMenu(menu.id);
+  });
 });
 
-//* ======================== Video Control ===================== */
+/* ======================== Video Control ===================== */
+/* Each control acts on every <video class="<name>-video"> on the page and
+   reports the new speed in <span id="<name>-msg">. */
 function ToggleVideo(x) {
   var videos = document.getElementsByClassName(x + '-video');
   for (var i = 0; i < videos.length; i++) {
-      if (videos[i].paused) {
-          videos[i].play();
-      } else {
-          videos[i].pause();
-      }
+    if (videos[i].paused) {
+      videos[i].play();
+    } else {
+      videos[i].pause();
+    }
   }
-};
+}
 
+function announceSpeed(x, videos) {
+  var msg = document.getElementById(x + '-msg');
+  if (!msg || !videos.length) return;
+
+  msg.innerHTML = 'Speed: ' + '×' + videos[0].playbackRate.toFixed(2);
+  msg.classList.add("fade-in-out");
+  msg.style.animation = 'none';
+  msg.offsetHeight; /* trigger reflow */
+  msg.style.animation = null;
+}
 
 function SlowVideo(x) {
   var videos = document.getElementsByClassName(x + '-video');
@@ -40,15 +69,8 @@ function SlowVideo(x) {
     videos[i].playbackRate = videos[i].playbackRate * 0.9;
     videos[i].play();
   }
-  
-  var msg = document.getElementById(x + '-msg');
-  msg.innerHTML = 'Speed: ' + '×' + videos[0].playbackRate.toFixed(2);
-
-  msg.classList.add("fade-in-out");
-  msg.style.animation = 'none';
-  msg.offsetHeight; /* trigger reflow */
-  msg.style.animation = null; };
-
+  announceSpeed(x, videos);
+}
 
 function FastVideo(x) {
   var videos = document.getElementsByClassName(x + '-video');
@@ -56,15 +78,8 @@ function FastVideo(x) {
     videos[i].playbackRate = videos[i].playbackRate / 0.9;
     videos[i].play();
   }
-
-  var msg = document.getElementById(x + '-msg');
-  msg.innerHTML = 'Speed: ' + '×' + videos[0].playbackRate.toFixed(2);
-
-  msg.classList.add("fade-in-out");
-  msg.style.animation = 'none';
-  msg.offsetHeight; /* trigger reflow */
-  msg.style.animation = null; 
-};
+  announceSpeed(x, videos);
+}
 
 function RestartVideo(x) {
   var videos = document.getElementsByClassName(x + '-video');
@@ -74,61 +89,55 @@ function RestartVideo(x) {
     videos[i].currentTime = 0;
     videos[i].play();
   }
-  
-  var msg = document.getElementById(x + '-msg');
-  msg.innerHTML = 'Speed: ' + '×' + videos[0].playbackRate.toFixed(2);
+  announceSpeed(x, videos);
+}
 
-  msg.classList.add("fade-in-out");
-  msg.style.animation = 'none';
-  msg.offsetHeight; /* trigger reflow */
-  msg.style.animation = null; 
-};
+/* ======================== Slide Show Control ===================== */
+/* Carousel for `.container .slider` with #prev_btn / #next_btn. The whole
+   block no-ops when the page has no slider, so main.js stays safe to include
+   on every page. */
+document.addEventListener('DOMContentLoaded', function() {
+  const slider = document.querySelector('.container .slider');
+  const btnLeft = document.getElementById('prev_btn');
+  const btnRight = document.getElementById('next_btn');
+  if (!slider || !btnLeft || !btnRight) return;
 
-//* ======================== Slide Show Control ===================== */
-const slider = document.querySelector('.container .slider');
-const [btnLeft, btnRight] = ['prev_btn', 'next_btn'].map(id => document.getElementById(id));
-let interval;
+  const SLIDE_WIDTH = 440;
+  let interval;
 
-// Set positions
-const setPositions = () => 
-    [...slider.children].forEach((item, i) => 
-        item.style.left = `${(i-1) * 440}px`);
+  const setPositions = () =>
+    [...slider.children].forEach((item, i) =>
+      item.style.left = `${(i - 1) * SLIDE_WIDTH}px`);
 
-// Initial setup
-setPositions();
+  const setTransitionSpeed = (speed) =>
+    [...slider.children].forEach(item =>
+      item.style.transitionDuration = speed);
 
-// Set transition speed
-const setTransitionSpeed = (speed) => {
-    [...slider.children].forEach(item => 
-        item.style.transitionDuration = speed);
-};
-
-// Slide functions
-const next = (isAuto = false) => { 
+  const next = (isAuto = false) => {
     setTransitionSpeed(isAuto ? '1.5s' : '0.2s');
-    slider.appendChild(slider.firstElementChild); 
-    setPositions(); 
-};
+    slider.appendChild(slider.firstElementChild);
+    setPositions();
+  };
 
-const prev = () => { 
+  const prev = () => {
     setTransitionSpeed('0.2s');
-    slider.prepend(slider.lastElementChild); 
-    setPositions(); 
-};
+    slider.prepend(slider.lastElementChild);
+    setPositions();
+  };
 
-// Auto slide
-const startAuto = () => interval = interval || setInterval(() => next(true), 2000);
-const stopAuto = () => { clearInterval(interval); interval = null; };
+  const startAuto = () => interval = interval || setInterval(() => next(true), 2000);
+  const stopAuto = () => { clearInterval(interval); interval = null; };
 
-// Event listeners
-btnRight.addEventListener('click', () => next(false));
-btnLeft.addEventListener('click', prev);
+  setPositions();
 
-// Mouse hover controls
-[slider, btnLeft, btnRight].forEach(el => {
+  btnRight.addEventListener('click', () => next(false));
+  btnLeft.addEventListener('click', prev);
+
+  // Pause the carousel while the reader is looking at it
+  [slider, btnLeft, btnRight].forEach(el => {
     el.addEventListener('mouseover', stopAuto);
     el.addEventListener('mouseout', startAuto);
-});
+  });
 
-// Start auto slide
-startAuto();
+  startAuto();
+});
